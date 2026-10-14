@@ -1,0 +1,51 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Psychologist {
+  id          String   @id @default(cuid())
+  name        String
+  email       String   @unique
+  telegramId  String?
+  bio         String
+  approaches  String[]
+  languages   String[]
+  format      String[]
+  priceTier   String
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  matches     Match[]
+}
+
+model TriageRequest {
+  id               String   @id @default(cuid())
+  name             String
+  contact          String
+  problem          String
+  budgetTier       String
+  preferredFormat  String
+  language         String
+  approachPref     String?
+  urgency          String
+  status           String   @default("new")
+  createdAt        DateTime @default(now())
+  matches          Match[]
+}
+
+model Match {
+  id               String   @id @default(cuid())
+  triageRequestId  String
+  psychologistId   String
+  notes            String?
+  status           String   @default("proposed")
+  createdAt        DateTime @default(now())
+
+  triageRequest    TriageRequest @relation(fields: [triageRequestId], references: [id])
+  psychologist     Psychologist  @relation(fields: [psychologistId], references: [id])
+}
